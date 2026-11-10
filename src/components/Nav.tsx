@@ -9,7 +9,7 @@ import Logo from "./Logo";
 
 export function Header({ profile }: { profile: Profile | null }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 pt-[env(safe-area-inset-top)] backdrop-blur">
       <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
         <Link href="/" aria-label="COINER PADEL TOUR - Inicio"><Logo /></Link>
         {profile ? (
@@ -48,7 +48,7 @@ export function BottomNav({ isAdmin, loggedIn }: { isAdmin: boolean; loggedIn: b
   return (
     <>
       {pending && <div className="nav-progress fixed inset-x-0 top-0 z-50 h-1 bg-accent-500" />}
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 pb-[max(env(safe-area-inset-bottom),6px)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] backdrop-blur">
         <ul className="mx-auto flex max-w-3xl">
           {items.map((it) => {
             const active = current === it.href;
