@@ -2,6 +2,7 @@ import Link from "next/link";
 import Logo from "@/components/Logo";
 import StatusChip from "@/components/StatusChip";
 import UpcomingRounds, { upcomingRounds } from "@/components/UpcomingRounds";
+import InstallPrompt from "@/components/InstallPrompt";
 import Carousel from "@/components/Carousel";
 import RankingTable, { ScoringRules } from "@/components/RankingTable";
 import { createClient } from "@/lib/supabase-server";
@@ -32,6 +33,7 @@ export default async function Home() {
 
   return (
     <div className="space-y-6">
+      <InstallPrompt />
       <Carousel slides={slides} />
 
       {current ? (
