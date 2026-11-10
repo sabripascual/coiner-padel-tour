@@ -3,6 +3,7 @@ import "./globals.css";
 import { Header, BottomNav } from "@/components/Nav";
 import { getCurrentProfile } from "@/lib/auth";
 import RegisterSW from "@/components/RegisterSW";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: { default: "COINER PADEL TOUR", template: "%s · COINER PADEL TOUR" },
@@ -28,9 +29,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
       </head>
-      <body className="min-h-dvh pb-24">
+      <body className="flex min-h-dvh flex-col">
         <Header profile={profile} />
-        <main className="mx-auto w-full max-w-3xl px-4 py-4">{children}</main>
+        <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-4">{children}</main>
+        <Footer />
         <BottomNav isAdmin={!!profile?.is_admin} loggedIn={!!profile} />
         <RegisterSW />
       </body>
