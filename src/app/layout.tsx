@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: "COINER PADEL TOUR" },
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: "Coiner Padel", statusBarStyle: "default" },
-  icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
+  icons: { icon: "/icons/icon-192.png?v=2", apple: "/icons/apple-touch-icon.png?v=2" },
 };
 
 export const viewport: Viewport = {
