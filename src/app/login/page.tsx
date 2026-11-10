@@ -1,12 +1,10 @@
 "use client";
 import Logo from "@/components/Logo";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase-browser";
 import { usernameToEmail } from "@/lib/utils";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -19,8 +17,8 @@ export default function LoginPage() {
     const { error } = await createClient().auth.signInWithPassword({ email: usernameToEmail(username), password });
     setLoading(false);
     if (error) return setError("Usuario o clave incorrectos");
-    router.push("/mi-perfil");
-    router.refresh();
+    // Recarga completa: el header, el menú y las páginas precargadas pasan a mostrar la sesión
+    window.location.assign("/mi-perfil");
   }
 
   return (

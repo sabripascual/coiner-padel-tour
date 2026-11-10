@@ -51,8 +51,7 @@ export default function ProfileForms({ profile }: { profile: Profile }) {
 
   async function logout() {
     await supabase.auth.signOut();
-    router.push("/");
-    router.refresh();
+    window.location.assign("/");
   }
 
   return (

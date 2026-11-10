@@ -4,6 +4,7 @@ import { Header, BottomNav } from "@/components/Nav";
 import { getCurrentProfile } from "@/lib/auth";
 import RegisterSW from "@/components/RegisterSW";
 import Footer from "@/components/Footer";
+import AuthSync from "@/components/AuthSync";
 
 // URL pública del sitio (Vercel la define sola); WhatsApp necesita links absolutos a la imagen
 const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
@@ -49,6 +50,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Footer />
         <BottomNav isAdmin={!!profile?.is_admin} loggedIn={!!profile} />
         <RegisterSW />
+        <AuthSync loggedIn={!!profile} />
       </body>
     </html>
   );
