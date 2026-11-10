@@ -1,7 +1,7 @@
 "use client";
 import { useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase-browser";
-import { cn, displayName, points } from "@/lib/utils";
+import { cn, displayName, formatMoney, points } from "@/lib/utils";
 import type { RoundStat, Sex } from "@/lib/types";
 import Avatar from "@/components/Avatar";
 
@@ -19,7 +19,7 @@ function warning(s: S) {
   return null;
 }
 
-export default function Counters({ roundId, players, initial, editable }: { roundId: string; players: P[]; initial: RoundStat[]; editable: boolean }) {
+export default function Counters({ roundId, players, initial, editable, courtCost }: { roundId: string; players: P[]; initial: RoundStat[]; editable: boolean; courtCost: number | null }) {
   const supabase = useMemo(() => createClient(), []);
   const [stats, setStats] = useState<Record<string, S>>(() =>
     Object.fromEntries(initial.map((s) => [s.player_id, { played: s.played, won: s.won, games: s.games }])));
@@ -49,11 +49,23 @@ export default function Counters({ roundId, players, initial, editable }: { roun
     });
 
   const totals = Object.values(stats).reduce((acc, s) => ({ played: acc.played + s.played, won: acc.won + s.won }), { played: 0, won: 0 });
+  const attendees = Object.values(stats).filter((s) => s.played > 0).length;
 
   return (
     <div className="space-y-3">
       {!editable && <p className="rounded-xl bg-brand-50 px-3 py-2 text-sm text-brand-700">El torneo no está en curso: solo lectura.</p>}
       {error && <p className="rounded-xl bg-red-50 px-3 py-2 text-sm font-medium text-red-700">{error}</p>}
+
+      {courtCost != null && (
+        <div className="card flex items-center justify-between p-3 text-sm">
+          <span>Cancha: <b>{formatMoney(courtCost)}</b></span>
+          <span className="text-right">
+            {attendees > 0
+              ? <>Por jugador: <b className="text-brand-700">{formatMoney(Math.ceil(courtCost / attendees))}</b> <span className="text-xs text-gray-cool">({attendees} con PJ)</span></>
+              : <span className="text-xs text-gray-cool">Se divide entre quienes jueguen</span>}
+          </span>
+        </div>
+      )}
 
       <div className="flex gap-2">
         <input className="input" placeholder="Buscar jugador…" value={q} onChange={(e) => setQ(e.target.value)} />

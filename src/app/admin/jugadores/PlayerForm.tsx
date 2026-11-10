@@ -3,17 +3,18 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { createPlayer } from "../actions";
 import FormMessage from "@/components/FormMessage";
 
-export default function PlayerForm() {
+export default function PlayerForm({ tournamentId, label = "+ Nuevo jugador" }: { tournamentId?: string; label?: string }) {
   const [open, setOpen] = useState(false);
   const [state, action, pending] = useActionState(createPlayer, null);
   const ref = useRef<HTMLFormElement>(null);
   useEffect(() => { if (state?.ok) ref.current?.reset(); }, [state]);
 
-  if (!open) return <button onClick={() => setOpen(true)} className="btn-primary w-full">+ Nuevo jugador</button>;
+  if (!open) return <button onClick={() => setOpen(true)} className="btn-primary w-full">{label}</button>;
 
   return (
     <form ref={ref} action={action} className="card space-y-3 p-4">
       <h2 className="h2">Nuevo jugador</h2>
+      {tournamentId && <input type="hidden" name="tournament_id" value={tournamentId} />}
       <div className="grid grid-cols-2 gap-2">
         <div><label className="label">Nombre</label><input name="first_name" className="input" required /></div>
         <div><label className="label">Apellido</label><input name="last_name" className="input" required /></div>

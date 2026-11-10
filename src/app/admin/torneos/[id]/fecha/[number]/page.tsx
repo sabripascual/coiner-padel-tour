@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase-server";
-import { formatDate } from "@/lib/utils";
+import { roundDetails } from "@/lib/utils";
 import type { Profile, Round, RoundStat, Tournament } from "@/lib/types";
 import Counters from "./Counters";
 
@@ -32,7 +32,7 @@ export default async function FechaPage({ params }: { params: Promise<{ id: stri
       <div className="flex items-end justify-between">
         <div>
           <h1 className="h1">Fecha {round.number}</h1>
-          <p className="text-sm text-gray-cool">{formatDate(round.played_on)}{round.place ? ` · ${round.place}` : ""}</p>
+          <p className="text-sm text-gray-cool">{roundDetails(round)}</p>
         </div>
         <div className="flex gap-1">
           {round.number > 1 && <Link href={`/admin/torneos/${id}/fecha/${round.number - 1}`} className="btn-secondary px-3">‹</Link>}
@@ -41,6 +41,7 @@ export default async function FechaPage({ params }: { params: Promise<{ id: stri
       </div>
       <Counters
         roundId={round.id}
+        courtCost={round.court_cost != null ? Number(round.court_cost) : null}
         editable={tournament.status === "en_curso"}
         players={players.map((p) => ({ id: p.id, first_name: p.first_name, last_name: p.last_name, nickname: p.nickname, avatar_url: p.avatar_url, sex: p.sex }))}
         initial={(stats as RoundStat[]) ?? []}

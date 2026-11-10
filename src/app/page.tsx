@@ -5,7 +5,7 @@ import Carousel from "@/components/Carousel";
 import RankingTable from "@/components/RankingTable";
 import { createClient } from "@/lib/supabase-server";
 import { getPlayedRoundIds, getRounds, getTournamentRanking, getTournaments, pickDefaultTournament } from "@/lib/queries";
-import { formatDate, photoUrl } from "@/lib/utils";
+import { formatDate, photoUrl, roundDetails } from "@/lib/utils";
 import type { Photo } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -55,7 +55,7 @@ export default async function Home() {
             </div>
             {current.status === "en_curso" && next && (
               <p className="mt-3 text-sm text-gray-cool">
-                Próxima: <b>Fecha {next.number}</b>{next.played_on ? ` · ${formatDate(next.played_on)}` : ""}{next.place ? ` · ${next.place}` : ""}
+                Próxima: <b>Fecha {next.number}</b>{next.played_on || next.start_time || next.place ? ` · ${roundDetails(next)}` : ""}
               </p>
             )}
           </div>

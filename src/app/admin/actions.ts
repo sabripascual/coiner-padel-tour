@@ -40,8 +40,13 @@ export async function createPlayer(_: ActionState, f: FormData): Promise<ActionS
     await admin.auth.admin.deleteUser(data.user.id);
     return { error: pErr.message };
   }
+  const tournamentId = str(f, "tournament_id");
+  if (tournamentId) {
+    await admin.from("tournament_players").insert({ tournament_id: tournamentId, player_id: data.user.id });
+    revalidatePath(`/admin/torneos/${tournamentId}`);
+  }
   revalidatePath("/admin/jugadores");
-  return { ok: true, message: `Jugador creado. Ingresa con: ${email}` };
+  return { ok: true, message: `Jugador creado${tournamentId ? " e inscrito" : ""}. Ingresa con: ${email}` };
 }
 
 export async function updatePlayer(_: ActionState, f: FormData): Promise<ActionState> {
@@ -116,22 +121,27 @@ export async function deleteTournament(id: string) {
   redirect("/admin");
 }
 
-export async function setEnrollment(tournamentId: string, playerId: string, enrolled: boolean) {
+/** Inscribe (o quita) jugadores. La base de datos impide quitar a quien ya jugó en el torneo. */
+export async function setEnrollment(tournamentId: string, playerIds: string[], enrolled: boolean): Promise<ActionState> {
   await requireAdmin();
   const supabase = await createClient();
   const { error } = enrolled
-    ? await supabase.from("tournament_players").upsert({ tournament_id: tournamentId, player_id: playerId })
-    : await supabase.from("tournament_players").delete().eq("tournament_id", tournamentId).eq("player_id", playerId);
-  if (error) throw new Error(error.message);
+    ? await supabase.from("tournament_players").upsert(playerIds.map((player_id) => ({ tournament_id: tournamentId, player_id })))
+    : await supabase.from("tournament_players").delete().eq("tournament_id", tournamentId).in("player_id", playerIds);
   revalidatePath(`/admin/torneos/${tournamentId}`);
+  if (error) return { error: error.message.includes("ya jugó") ? "No se puede quitar: ya jugó partidos en este torneo" : error.message };
+  return { ok: true };
 }
 
 export async function updateRound(_: ActionState, f: FormData): Promise<ActionState> {
   await requireAdmin();
   const supabase = await createClient();
+  const costRaw = str(f, "court_cost").replace(/[^0-9]/g, "");
   const { error } = await supabase.from("rounds").update({
     played_on: str(f, "played_on") || null,
+    start_time: str(f, "start_time") || null,
     place: str(f, "place") || null,
+    court_cost: costRaw ? Number(costRaw) : null,
   }).eq("id", str(f, "id"));
   if (error) return { error: error.message };
   revalidatePath(`/admin/torneos/${str(f, "tournament_id")}`);

@@ -33,3 +33,18 @@ export const formatDate = (d: string | null) =>
   d ? new Date(d + (d.length === 10 ? "T12:00:00" : "")).toLocaleDateString("es", { day: "numeric", month: "short", year: "numeric" }) : "Sin fecha";
 
 export const cn = (...c: (string | false | null | undefined)[]) => c.filter(Boolean).join(" ");
+
+/** "19:30:00" -> "19:30 h" */
+export const formatTime = (t: string | null) => (t ? `${t.slice(0, 5)} h` : null);
+
+export const formatMoney = (n: number | null) =>
+  n == null ? null : `$${Number(n).toLocaleString("es-AR", { maximumFractionDigits: 0 })}`;
+
+/** Día · hora · lugar · costo, sin los datos que falten */
+export const roundDetails = (
+  r: { played_on: string | null; start_time: string | null; place: string | null; court_cost?: number | null },
+  withCost = false,
+) =>
+  [formatDate(r.played_on), formatTime(r.start_time), r.place, withCost ? formatMoney(r.court_cost ?? null) : null]
+    .filter(Boolean)
+    .join(" · ");

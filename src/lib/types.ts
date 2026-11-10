@@ -29,6 +29,8 @@ export type Round = {
   number: number;
   played_on: string | null;
   place: string | null;
+  start_time: string | null;   // "19:30:00"
+  court_cost: number | null;
 };
 
 export type RoundStat = {
