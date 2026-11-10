@@ -48,8 +48,9 @@ export function BottomNav({ isAdmin, loggedIn }: { isAdmin: boolean; loggedIn: b
   return (
     <>
       {pending && <div className="nav-progress fixed inset-x-0 top-0 z-50 h-1 bg-accent-500" />}
-      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 pb-[max(env(safe-area-inset-bottom),6px)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] backdrop-blur">
-        <ul className="mx-auto flex max-w-3xl">
+      {/* Barra flotante: separada de los bordes y esquinas redondeadas de la pantalla */}
+      <nav className="fixed bottom-[max(env(safe-area-inset-bottom),12px)] left-[max(env(safe-area-inset-left),12px)] right-[max(env(safe-area-inset-right),12px)] z-30 mx-auto max-w-md rounded-[1.75rem] bg-white shadow-[0_8px_30px_rgba(10,42,91,0.18)] ring-1 ring-slate-200 backdrop-blur">
+        <ul className="flex px-1.5 py-1">
           {items.map((it) => {
             const active = current === it.href;
             return (
@@ -59,11 +60,10 @@ export function BottomNav({ isAdmin, loggedIn }: { isAdmin: boolean; loggedIn: b
                   prefetch
                   onClick={() => !isActive(it.href) && setPending(it.href)}
                   className={cn(
-                    "relative flex flex-col items-center gap-0.5 py-2 text-[11px] font-semibold transition-colors duration-150 active:scale-90 motion-safe:transition-transform",
+                    "relative flex min-h-[56px] flex-col items-center justify-center gap-0.5 rounded-2xl py-1.5 text-[11px] font-semibold transition-colors duration-150 active:scale-90 motion-safe:transition-transform",
                     active ? "text-brand-700" : "text-gray-cool",
                   )}
                 >
-                  <span className={cn("absolute top-0 h-0.5 rounded-full bg-brand-700 transition-all duration-200", active ? "w-8 opacity-100" : "w-0 opacity-0")} />
                   <span className={cn("rounded-full px-4 py-0.5 transition-colors duration-150", active && "bg-brand-50")}>
                     <Icon d={it.d} />
                   </span>
