@@ -1,0 +1,88 @@
+"use client";
+import { useActionState, useState, useTransition } from "react";
+import { deleteTournament, renameTournament, setEnrollment, setTournamentStatus, updateRound } from "../../actions";
+import FormMessage from "@/components/FormMessage";
+import type { Round, Tournament } from "@/lib/types";
+
+export function TournamentControls({ tournament: t }: { tournament: Tournament }) {
+  const [state, action] = useActionState(renameTournament, null);
+  const [pending, start] = useTransition();
+  const [err, setErr] = useState<string | null>(null);
+
+  const change = (status: string, confirmText?: string) => {
+    if (confirmText && !confirm(confirmText)) return;
+    setErr(null);
+    start(async () => {
+      try { await setTournamentStatus(t.id, status); } catch (e) { setErr((e as Error).message); }
+    });
+  };
+
+  return (
+    <div className="card space-y-3 p-4">
+      <form action={action} className="flex gap-2">
+        <input type="hidden" name="id" value={t.id} />
+        <input name="name" defaultValue={t.name} className="input" required />
+        <button className="btn-secondary shrink-0">Renombrar</button>
+      </form>
+      <FormMessage state={state} />
+      <div className="flex flex-wrap gap-2">
+        {t.status === "borrador" && <button disabled={pending} onClick={() => change("en_curso")} className="btn-primary flex-1">▶ Iniciar torneo</button>}
+        {t.status === "en_curso" && (
+          <>
+            <button disabled={pending} onClick={() => change("finalizado", "¿Finalizar el torneo? Se declararán campeona y campeón según el ranking actual.")} className="btn-accent flex-1">🏆 Finalizar y declarar campeones</button>
+            <button disabled={pending} onClick={() => change("borrador")} className="btn-secondary">Volver a Próximamente</button>
+          </>
+        )}
+        {t.status === "finalizado" && <button disabled={pending} onClick={() => change("en_curso", "¿Reabrir el torneo? Se quitarán los campeones hasta volver a finalizarlo.")} className="btn-secondary flex-1">Reabrir torneo</button>}
+      </div>
+      {err && <p className="text-sm text-red-600">{err}</p>}
+      {t.status === "borrador" && (
+        <button onClick={() => confirm("¿Borrar el torneo y todos sus datos?") && start(() => deleteTournament(t.id))} className="text-xs text-red-600">Borrar torneo</button>
+      )}
+    </div>
+  );
+}
+
+export function RoundEditor({ round }: { round: Round }) {
+  const [open, setOpen] = useState(false);
+  const [state, action, pending] = useActionState(updateRound, null);
+  if (!open) return <button onClick={() => setOpen(true)} className="text-xs font-semibold text-brand-700">Editar</button>;
+  return (
+    <div className="fixed inset-0 z-40 grid place-items-end bg-black/40 sm:place-items-center" onClick={() => setOpen(false)}>
+      <form action={action} onClick={(e) => e.stopPropagation()} className="w-full space-y-3 rounded-t-2xl bg-white p-5 sm:max-w-sm sm:rounded-2xl">
+        <h3 className="h2">Fecha {round.number}</h3>
+        <input type="hidden" name="id" value={round.id} />
+        <input type="hidden" name="tournament_id" value={round.tournament_id} />
+        <div><label className="label">Día</label><input type="date" name="played_on" defaultValue={round.played_on ?? ""} className="input" /></div>
+        <div><label className="label">Lugar / cancha</label><input name="place" defaultValue={round.place ?? ""} className="input" /></div>
+        <FormMessage state={state} />
+        <div className="flex gap-2">
+          <button type="button" onClick={() => setOpen(false)} className="btn-secondary flex-1">Cerrar</button>
+          <button className="btn-primary flex-1" disabled={pending}>Guardar</button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+export function Enrollment({ tournamentId, players, enrolled }: { tournamentId: string; players: { id: string; name: string; active: boolean }[]; enrolled: string[] }) {
+  const [set, setSet] = useState(new Set(enrolled));
+  const [, start] = useTransition();
+  const toggle = (id: string) => {
+    const on = !set.has(id);
+    const next = new Set(set);
+    if (on) next.add(id); else next.delete(id);
+    setSet(next);
+    start(() => setEnrollment(tournamentId, id, on));
+  };
+  return (
+    <div className="card divide-y divide-gray-light">
+      {players.map((p) => (
+        <label key={p.id} className="flex items-center gap-3 px-4 py-2.5 text-sm">
+          <input type="checkbox" checked={set.has(p.id)} onChange={() => toggle(p.id)} className="h-5 w-5 accent-brand-700" />
+          <span className={p.active ? "" : "text-gray-cool line-through"}>{p.name}</span>
+        </label>
+      ))}
+    </div>
+  );
+}
