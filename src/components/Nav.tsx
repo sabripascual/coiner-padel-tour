@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import type { Profile } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import Avatar from "./Avatar";
@@ -30,6 +31,10 @@ const Icon = ({ d }: { d: string }) => (
 
 export function BottomNav({ isAdmin, loggedIn }: { isAdmin: boolean; loggedIn: boolean }) {
   const path = usePathname();
+  // Resalta al instante el botón tocado, sin esperar a que llegue la página
+  const [pending, setPending] = useState<string | null>(null);
+  useEffect(() => setPending(null), [path]);
+
   const items = [
     { href: "/", label: "Inicio", d: "M3 11l9-8 9 8M5 10v10h14V10" },
     { href: "/ranking", label: "Ranking", d: "M8 21V11M16 21V7M12 21V3M4 21h16" },
@@ -37,21 +42,38 @@ export function BottomNav({ isAdmin, loggedIn }: { isAdmin: boolean; loggedIn: b
     { href: loggedIn ? "/mi-perfil" : "/login", label: loggedIn ? "Mi perfil" : "Ingresar", d: "M12 12a4 4 0 100-8 4 4 0 000 8zM4 21a8 8 0 0116 0" },
     ...(isAdmin ? [{ href: "/admin", label: "Admin", d: "M12 15a3 3 0 100-6 3 3 0 000 6zM19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z" }] : []),
   ];
+  const isActive = (href: string) => (href === "/" ? path === "/" : path.startsWith(href));
+  const current = pending ?? items.find((it) => isActive(it.href))?.href;
+
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
-      <ul className="mx-auto flex max-w-3xl">
-        {items.map((it) => {
-          const active = it.href === "/" ? path === "/" : path.startsWith(it.href);
-          return (
-            <li key={it.href} className="flex-1">
-              <Link href={it.href} className={cn("flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium", active ? "text-brand-700" : "text-gray-cool")}>
-                <Icon d={it.d} />
-                {it.label}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+    <>
+      {pending && <div className="nav-progress fixed inset-x-0 top-0 z-50 h-1 bg-accent-500" />}
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
+        <ul className="mx-auto flex max-w-3xl">
+          {items.map((it) => {
+            const active = current === it.href;
+            return (
+              <li key={it.href} className="flex-1">
+                <Link
+                  href={it.href}
+                  prefetch
+                  onClick={() => !isActive(it.href) && setPending(it.href)}
+                  className={cn(
+                    "relative flex flex-col items-center gap-0.5 py-2 text-[11px] font-semibold transition-colors duration-150 active:scale-90 motion-safe:transition-transform",
+                    active ? "text-brand-700" : "text-gray-cool",
+                  )}
+                >
+                  <span className={cn("absolute top-0 h-0.5 rounded-full bg-brand-700 transition-all duration-200", active ? "w-8 opacity-100" : "w-0 opacity-0")} />
+                  <span className={cn("rounded-full px-4 py-0.5 transition-colors duration-150", active && "bg-brand-50")}>
+                    <Icon d={it.d} />
+                  </span>
+                  {it.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </>
   );
 }

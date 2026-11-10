@@ -1,13 +1,14 @@
 import "server-only";
+import { cache } from "react";
 import { createClient } from "./supabase-server";
 import type { RankingRow, Round, Tournament } from "./types";
 import { sortRanking } from "./utils";
 
-export async function getTournaments(): Promise<Tournament[]> {
+export const getTournaments = cache(async (): Promise<Tournament[]> => {
   const supabase = await createClient();
   const { data } = await supabase.from("tournaments").select("*").order("created_at", { ascending: false });
   return (data as Tournament[]) ?? [];
-}
+});
 
 /** Torneo por defecto: el último en curso, o el último finalizado. */
 export function pickDefaultTournament(list: Tournament[]) {

@@ -17,10 +17,11 @@ export async function middleware(request: NextRequest) {
       },
     },
   );
-  await supabase.auth.getUser();
+  // Refresca la sesión si venció; verifica el JWT localmente cuando es posible.
+  await supabase.auth.getClaims();
   return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icons|manifest.webmanifest|sw.js).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|icons|manifest.webmanifest|sw.js|.*\\.(?:png|webp|svg|jpg|ico)$).*)"],
 };
