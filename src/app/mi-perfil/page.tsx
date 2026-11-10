@@ -57,7 +57,7 @@ export default async function MiPerfil() {
             <Stat v={mine.points} l="Puntos" />
             <Stat v={mine.played} l="Jugados" />
             <Stat v={mine.won} l="Ganados" />
-            <Stat v={mine.games} l="Games" />
+            <Stat v={mine.games} l="Games (derrotas)" />
           </div>
           <p className="text-sm text-gray-cool">
             Efectividad: <b>{mine.played ? Math.round((mine.won / mine.played) * 100) : 0}%</b> · Fechas asistidas: <b>{mine.rounds_attended}/10</b>
@@ -73,7 +73,7 @@ export default async function MiPerfil() {
             <Stat v={hist.points} l="Puntos" />
             <Stat v={hist.played} l="PJ" />
             <Stat v={hist.won} l="PG" />
-            <Stat v={hist.games} l="GG" />
+            <Stat v={hist.games} l="GP" />
           </div>
         </section>
       )}
@@ -90,7 +90,7 @@ export default async function MiPerfil() {
                   <div className="font-semibold">
                     {tournaments.find((t) => t.id === r.rounds.tournament_id)?.name} · Fecha {r.rounds.number}
                   </div>
-                  <div className="text-xs text-gray-cool">{formatDate(r.rounds.played_on)} · {r.played} PJ · {r.won} PG · {r.games} GG</div>
+                  <div className="text-xs text-gray-cool">{formatDate(r.rounds.played_on)} · {r.played} PJ · {r.won} PG · {r.games} GP</div>
                 </div>
                 <div className="text-lg font-extrabold tabular-nums text-brand-700">{points(r)}</div>
               </div>

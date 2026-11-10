@@ -21,7 +21,7 @@ export default function RankingTable({ rows, highlightId, extra }: {
             <th className="py-2 text-left">Jugador</th>
             <th className="w-10 py-2 text-center" title="Partidos jugados">PJ</th>
             <th className="w-10 py-2 text-center" title="Partidos ganados">PG</th>
-            <th className="w-10 py-2 text-center" title="Games ganados">GG</th>
+            <th className="w-10 py-2 text-center" title="Games ganados en partidos perdidos">GP</th>
             {extra === "titles" && <th className="w-8 py-2 text-center" title="Títulos">🏆</th>}
             <th className="w-12 py-2 pr-3 text-right">Pts</th>
           </tr>
@@ -49,8 +49,27 @@ export default function RankingTable({ rows, highlightId, extra }: {
         </tbody>
       </table>
       <p className="border-t border-gray-light px-3 py-2 text-[11px] text-gray-cool">
-        PJ jugados · PG ganados · GG games ganados · Pts = GG + 3 × PG. Desempate: puntos, games, ganados.
+        PJ jugados · PG ganados · GP games ganados en partidos perdidos
       </p>
     </div>
+  );
+}
+
+/** Reglamento de puntos, visible debajo de los rankings */
+export function ScoringRules() {
+  const row = "flex items-center justify-between gap-3 px-4 py-2.5";
+  return (
+    <section className="card overflow-hidden text-sm" aria-label="Reglamento de puntos">
+      <h3 className="bg-soft-blue px-4 py-2 font-display text-xs font-bold uppercase tracking-wide text-brand-700">¿Cómo se suman los puntos?</h3>
+      <div className="divide-y divide-gray-light">
+        <div className={row}><span>🏆 <b>Ganar el partido</b> (2-0 o 2-1)</span><span className="chip bg-brand-700 text-white">+3 pts</span></div>
+        <div className={row}><span>💪 <b>Perder 2-1</b> (ganaste 1 game)</span><span className="chip bg-accent-500 text-white">+1 pt</span></div>
+        <div className={row}><span>Perder 2-0</span><span className="chip bg-slate-200 text-navy">0 pts</span></div>
+      </div>
+      <p className="border-t border-gray-light px-4 py-2 text-xs text-gray-cool">
+        Los puntos son por jugador. El ganador no suma sus games: solo los 3 puntos del partido.
+        Desempate: puntos → partidos ganados → games.
+      </p>
+    </section>
   );
 }

@@ -139,6 +139,8 @@ export async function updateRound(_: ActionState, f: FormData): Promise<ActionSt
   const costRaw = str(f, "court_cost").replace(/[^0-9]/g, "");
   const duration = str(f, "duration_hours").replace(",", ".");
   const mapsUrl = str(f, "maps_url");
+  const lat = str(f, "lat");
+  const lng = str(f, "lng");
   if (mapsUrl && !/^https:\/\//i.test(mapsUrl)) return { error: "El link de Google Maps debe empezar con https://" };
   const { error } = await supabase.from("rounds").update({
     played_on: str(f, "played_on") || null,
@@ -146,6 +148,8 @@ export async function updateRound(_: ActionState, f: FormData): Promise<ActionSt
     duration_hours: duration ? Number(duration) : null,
     place: str(f, "place") || null,
     maps_url: mapsUrl || null,
+    lat: lat && lng ? Number(lat) : null,
+    lng: lat && lng ? Number(lng) : null,
     court_cost: costRaw ? Number(costRaw) : null,
   }).eq("id", str(f, "id"));
   if (error) return { error: error.message };

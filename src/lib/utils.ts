@@ -13,12 +13,13 @@ export const displayName = (p: { first_name: string; last_name: string; nickname
 
 export const fullName = (p: { first_name: string; last_name: string }) => `${p.first_name} ${p.last_name}`;
 
-/** Orden del ranking: puntos > games > partidos ganados */
+/** Orden del ranking: puntos > partidos ganados > games */
 export const sortRanking = <T extends RankingRow>(rows: T[]) =>
-  [...rows].sort((a, b) => b.points - a.points || b.games - a.games || b.won - a.won ||
+  [...rows].sort((a, b) => b.points - a.points || b.won - a.won || b.games - a.games ||
     a.first_name.localeCompare(b.first_name));
 
-export const points = (s: { won: number; games: number }) => s.games + 3 * s.won;
+/** Puntos = 3 por partido ganado + 1 por game ganado en un partido perdido */
+export const points = (s: { won: number; games: number }) => 3 * s.won + s.games;
 
 export const STATUS_LABEL: Record<TournamentStatus, string> = {
   borrador: "Próximamente",
@@ -54,9 +55,11 @@ export const formatTimeRange = (start: string | null, duration: number | null | 
   return `${start.slice(0, 5)} a ${pad(Math.floor(end / 60))}:${pad(end % 60)} h`;
 };
 
-/** Link a Google Maps: el que cargó el admin o, si no hay, una búsqueda por el nombre del lugar */
-export const mapsLink = (r: { maps_url?: string | null; place: string | null }) =>
-  r.maps_url || (r.place ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.place)}` : null);
+/** Link a Google Maps: punto marcado en el mapa > link cargado > búsqueda por nombre del lugar */
+export const mapsLink = (r: { lat?: number | null; lng?: number | null; maps_url?: string | null; place: string | null }) =>
+  r.lat != null && r.lng != null
+    ? `https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lng}`
+    : r.maps_url || (r.place ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.place)}` : null);
 
 export const DURATIONS = [1, 1.5, 2, 2.5, 3];
 

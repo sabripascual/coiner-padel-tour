@@ -33,6 +33,8 @@ export type Round = {
   court_cost: number | null;
   duration_hours: number | null;
   maps_url: string | null;
+  lat: number | null;
+  lng: number | null;
 };
 
 export type RoundStat = {

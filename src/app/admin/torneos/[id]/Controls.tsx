@@ -4,6 +4,12 @@ import { deleteTournament, renameTournament, setEnrollment, setTournamentStatus,
 import FormMessage from "@/components/FormMessage";
 import type { Round, Tournament } from "@/lib/types";
 import { DURATIONS, formatDuration } from "@/lib/utils";
+import dynamic from "next/dynamic";
+
+const LocationPicker = dynamic(() => import("@/components/map/LocationPicker"), {
+  ssr: false,
+  loading: () => <div className="h-56 animate-pulse rounded-xl bg-slate-200" />,
+});
 
 export function TournamentControls({ tournament: t }: { tournament: Tournament }) {
   const [state, action] = useActionState(renameTournament, null);
@@ -68,9 +74,13 @@ export function RoundEditor({ round }: { round: Round }) {
         </div>
         <div><label className="label">Lugar / cancha</label><input name="place" defaultValue={round.place ?? ""} placeholder="Ej: Club Norte · Cancha 3" className="input" /></div>
         <div>
-          <label className="label">Ubicación (link de Google Maps)</label>
-          <input name="maps_url" type="url" inputMode="url" defaultValue={round.maps_url ?? ""} placeholder="https://maps.app.goo.gl/…" className="input" />
-          <p className="mt-1 text-xs text-gray-cool">En Google Maps: busca el lugar → Compartir → Copiar vínculo. Si lo dejas vacío, se busca por el nombre del lugar.</p>
+          <label className="label">Ubicación en el mapa</label>
+          <LocationPicker lat={round.lat} lng={round.lng} place={round.place} />
+          <details className="mt-2 text-xs">
+            <summary className="cursor-pointer font-semibold text-gray-cool">O pegar un link de Google Maps</summary>
+            <input name="maps_url" type="url" inputMode="url" defaultValue={round.maps_url ?? ""} placeholder="https://maps.app.goo.gl/…" className="input mt-2" />
+            <p className="mt-1 text-gray-cool">Se usa solo si no hay un punto marcado en el mapa.</p>
+          </details>
         </div>
         <div>
           <label className="label">Costo de la reserva ($)</label>

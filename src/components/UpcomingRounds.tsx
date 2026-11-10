@@ -1,5 +1,6 @@
 import type { Round } from "@/lib/types";
 import { formatDuration, formatMoney, formatTimeRange, mapsLink } from "@/lib/utils";
+import MiniMap from "./map/MiniMap";
 
 const TZ = "America/Argentina/Buenos_Aires";
 
@@ -23,7 +24,7 @@ export default function UpcomingRounds({ rounds }: { rounds: Round[] }) {
         const link = mapsLink(r);
         return (
           <article key={r.id} className="card flex gap-3 p-3">
-            <div className="flex w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-brand-700 py-2 text-white">
+            <div className="flex w-14 shrink-0 flex-col items-center justify-center self-start rounded-xl bg-brand-700 py-2 text-white">
               <span className="text-[10px] font-bold uppercase tracking-wide opacity-80">
                 {d.toLocaleDateString("es", { weekday: "short" }).replace(".", "")}
               </span>
@@ -42,7 +43,10 @@ export default function UpcomingRounds({ rounds }: { rounds: Round[] }) {
               )}
               {r.place && <p className="truncate text-sm">📍 {r.place}</p>}
               {r.court_cost != null && <p className="text-xs text-gray-cool">Cancha: {formatMoney(r.court_cost)}</p>}
-              {link && (
+              {link && r.lat != null && r.lng != null && (
+                <div className="pt-1.5"><MiniMap lat={r.lat} lng={r.lng} href={link} /></div>
+              )}
+              {link && (r.lat == null || r.lng == null) && (
                 <a href={link} target="_blank" rel="noopener noreferrer"
                   className="mt-1.5 inline-flex items-center gap-1 rounded-lg bg-accent-500 px-3 py-1.5 font-display text-xs font-bold text-white active:scale-95">
                   Cómo llegar ↗

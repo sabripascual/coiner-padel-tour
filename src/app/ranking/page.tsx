@@ -1,5 +1,5 @@
 import Link from "next/link";
-import RankingTable from "@/components/RankingTable";
+import RankingTable, { ScoringRules } from "@/components/RankingTable";
 import { getCurrentProfile } from "@/lib/auth";
 import { getHistoricalRanking, getTournamentRanking, getTournaments, pickDefaultTournament } from "@/lib/queries";
 import { createClient } from "@/lib/supabase-server";
@@ -79,6 +79,7 @@ export default async function RankingPage({ searchParams }: { searchParams: Prom
       )}
 
       <RankingTable rows={rows} highlightId={me?.id} extra={historical || !tournament ? "titles" : undefined} />
+      <ScoringRules />
     </div>
   );
 }

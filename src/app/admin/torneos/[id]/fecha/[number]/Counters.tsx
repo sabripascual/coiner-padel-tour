@@ -11,13 +11,6 @@ type Field = "played" | "won" | "games";
 
 const EMPTY: S = { played: 0, won: 0, games: 0 };
 
-/** Partido al mejor de 3 games: ganador 2 games, perdedor 0 o 1. */
-function warning(s: S) {
-  const lost = s.played - s.won;
-  if (s.games < 2 * s.won) return `Con ${s.won} ganado(s) debería tener al menos ${2 * s.won} games`;
-  if (s.games > 2 * s.won + lost) return `Con ${s.played} jugado(s) y ${s.won} ganado(s), máximo ${2 * s.won + lost} games`;
-  return null;
-}
 
 export default function Counters({ roundId, players, initial, editable, courtCost }: { roundId: string; players: P[]; initial: RoundStat[]; editable: boolean; courtCost: number | null }) {
   const supabase = useMemo(() => createClient(), []);
@@ -75,14 +68,16 @@ export default function Counters({ roundId, players, initial, editable, courtCos
           <option value="points">Puntos</option>
         </select>
       </div>
-      <p className="text-xs text-gray-cool">
-        Partidos cargados: ~{Math.round(totals.played / 4)} (suma de PJ ÷ 4). Ordena por “Menos jugados” para equilibrar quién entra a la cancha.
-      </p>
+      <div className="card space-y-1 p-3 text-xs">
+        <p className="font-display font-bold text-navy">Después de cada partido:</p>
+        <p>🏆 <b>Ganadores:</b> +1 en <b>Ganados</b> (suma el jugado solo) → +3 pts</p>
+        <p>💪 <b>Perdedores:</b> +1 en <b>Jugados</b>, y si ganaron un game, +1 en <b>Games</b> → +1 pt</p>
+        <p className="text-gray-cool">Partidos cargados: ~{Math.round(totals.played / 4)} · Ordena por “Menos jugados” para equilibrar quién entra.</p>
+      </div>
 
       <div className="space-y-2">
         {list.map((p) => {
           const s = stats[p.id] ?? EMPTY;
-          const w = warning(s);
           return (
             <div key={p.id} className="card p-3">
               <div className="mb-2 flex items-center gap-2">
@@ -94,20 +89,22 @@ export default function Counters({ roundId, players, initial, editable, courtCos
                 </div>
               </div>
               <div className="grid grid-cols-3 gap-2">
-                {([["played", "Jugados"], ["won", "Ganados"], ["games", "Games"]] as [Field, string][]).map(([f, label]) => (
+                {([["won", "Ganados"], ["played", "Jugados"], ["games", "Games"]] as [Field, string][]).map(([f, label]) => (
                   <div key={f} className="rounded-xl bg-soft-blue p-1.5 text-center">
                     <div className="text-[10px] font-bold uppercase tracking-wide text-brand-700">{label}</div>
                     <div className="flex items-center justify-between">
                       <button aria-label={`Restar ${label}`} disabled={!editable || s[f] === 0 || !!busy} onClick={() => adjust(p.id, f, -1)}
                         className="grid h-9 w-9 place-items-center rounded-lg bg-white text-lg font-bold text-navy shadow-sm disabled:opacity-30">−</button>
                       <span className={cn("text-lg font-extrabold tabular-nums", busy === p.id + f && "opacity-40")}>{s[f]}</span>
-                      <button aria-label={`Sumar ${label}`} disabled={!editable || !!busy} onClick={() => adjust(p.id, f, 1)}
+                      <button aria-label={`Sumar ${label}`} disabled={!editable || !!busy || (f === "games" && s.games >= s.played - s.won)} onClick={() => adjust(p.id, f, 1)}
                         className="grid h-9 w-9 place-items-center rounded-lg bg-brand-700 text-lg font-bold text-white shadow-sm disabled:opacity-30">+</button>
                     </div>
                   </div>
                 ))}
               </div>
-              {w && <p className="mt-2 text-xs font-medium text-accent-600">⚠ {w}</p>}
+              <p className="mt-1.5 text-[11px] text-gray-cool">
+                {s.won} ganado(s) · {s.played - s.won} perdido(s){s.played - s.won > 0 ? ` · games en derrotas: ${s.games}/${s.played - s.won}` : ""}
+              </p>
             </div>
           );
         })}
