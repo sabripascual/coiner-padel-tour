@@ -20,7 +20,9 @@ export async function createPlayer(_: ActionState, f: FormData): Promise<ActionS
   const nickname = str(f, "nickname") || null;
   const sex = str(f, "sex");
   const is_admin = f.get("is_admin") === "on";
+  const email = (str(f, "email") || usernameToEmail(username)).toLowerCase();
 
+  if (!/^\S+@\S+\.\S+$/.test(email)) return { error: "Email inválido" };
   if (!/^[a-z0-9._-]{3,30}$/.test(username)) return { error: "Usuario: 3 a 30 caracteres, solo minúsculas, números, punto, guion" };
   if (password.length < 6) return { error: "La clave debe tener al menos 6 caracteres" };
   if (!first_name || !last_name) return { error: "Nombre y apellido son obligatorios" };
@@ -28,10 +30,10 @@ export async function createPlayer(_: ActionState, f: FormData): Promise<ActionS
 
   const admin = createServiceClient();
   const { data, error } = await admin.auth.admin.createUser({
-    email: usernameToEmail(username), password, email_confirm: true, user_metadata: { username },
+    email, password, email_confirm: true, user_metadata: { username },
   });
   if (error || !data.user) {
-    return { error: error?.message.includes("already") ? "Ese usuario ya existe" : error?.message ?? "No se pudo crear" };
+    return { error: error?.message.includes("already") ? "Ese email ya está registrado" : error?.message ?? "No se pudo crear" };
   }
   const { error: pErr } = await admin.from("profiles").insert({ id: data.user.id, username, first_name, last_name, nickname, sex, is_admin });
   if (pErr) {
@@ -39,7 +41,7 @@ export async function createPlayer(_: ActionState, f: FormData): Promise<ActionS
     return { error: pErr.message };
   }
   revalidatePath("/admin/jugadores");
-  return { ok: true, message: `Jugador creado. Usuario: ${username}` };
+  return { ok: true, message: `Jugador creado. Ingresa con: ${email}` };
 }
 
 export async function updatePlayer(_: ActionState, f: FormData): Promise<ActionState> {

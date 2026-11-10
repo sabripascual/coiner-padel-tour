@@ -28,12 +28,12 @@ export default function LoginPage() {
       <div className="mb-6 text-center">
         <div className="flex justify-center"><Logo size="lg" /></div>
         <h1 className="h1 mt-6">Ingresar</h1>
-        <p className="text-sm text-gray-cool">Tu usuario y clave te los da el admin del torneo.</p>
+        <p className="text-sm text-gray-cool">Tu email y clave te los da el admin del torneo.</p>
       </div>
       <form onSubmit={onSubmit} className="card space-y-4 p-5">
         <div>
-          <label className="label" htmlFor="u">Usuario</label>
-          <input id="u" className="input" autoCapitalize="none" autoComplete="username" required value={username} onChange={(e) => setUsername(e.target.value)} />
+          <label className="label" htmlFor="u">Email o usuario</label>
+          <input id="u" className="input" autoCapitalize="none" autoComplete="username" type="text" inputMode="email" placeholder="nombre@totalcoin.com" required value={username} onChange={(e) => setUsername(e.target.value)} />
         </div>
         <div>
           <label className="label" htmlFor="p">Clave</label>

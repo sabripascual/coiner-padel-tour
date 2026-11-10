@@ -29,8 +29,9 @@ export default function PlayerForm() {
           </select>
         </div>
       </div>
+      <div><label className="label">Email (con el que ingresará)</label><input name="email" type="email" className="input" autoCapitalize="none" placeholder="nombre@totalcoin.com" required /></div>
       <div className="grid grid-cols-2 gap-2">
-        <div><label className="label">Usuario</label><input name="username" className="input" autoCapitalize="none" required placeholder="ej: juanp" /></div>
+        <div><label className="label">Usuario (visible)</label><input name="username" className="input" autoCapitalize="none" required placeholder="ej: jperez" /></div>
         <div><label className="label">Clave inicial</label><input name="password" className="input" required minLength={6} /></div>
       </div>
       <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="is_admin" className="h-4 w-4" /> Dar permiso de admin</label>

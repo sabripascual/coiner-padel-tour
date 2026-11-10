@@ -2,8 +2,11 @@ import type { RankingRow, TournamentStatus } from "./types";
 
 export const LOGIN_DOMAIN = process.env.NEXT_PUBLIC_LOGIN_DOMAIN || "padelcoiner.app";
 
-export const usernameToEmail = (username: string) =>
-  `${username.trim().toLowerCase()}@${LOGIN_DOMAIN}`;
+/** Acepta el email completo o solo el usuario (se le agrega el dominio por defecto). */
+export const usernameToEmail = (input: string) => {
+  const v = input.trim().toLowerCase();
+  return v.includes("@") ? v : `${v}@${LOGIN_DOMAIN}`;
+};
 
 export const displayName = (p: { first_name: string; last_name: string; nickname: string | null }) =>
   p.nickname?.trim() ? p.nickname : `${p.first_name} ${p.last_name.charAt(0)}.`;
