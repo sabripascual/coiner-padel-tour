@@ -40,6 +40,7 @@ export default function LoginPage() {
         {error && <p className="text-sm font-medium text-red-600">{error}</p>}
         <button className="btn-primary w-full" disabled={loading}>{loading ? "Ingresando…" : "Ingresar"}</button>
         <p className="text-center text-xs text-gray-cool">¿Olvidaste la clave? Pídele al admin que la resetee.</p>
+        <p className="text-center text-xs text-gray-cool">📱 Si instalaste la app, ingresa una vez desde la app: tu sesión queda guardada.</p>
       </form>
     </div>
   );
