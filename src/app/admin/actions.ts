@@ -137,13 +137,19 @@ export async function updateRound(_: ActionState, f: FormData): Promise<ActionSt
   await requireAdmin();
   const supabase = await createClient();
   const costRaw = str(f, "court_cost").replace(/[^0-9]/g, "");
+  const duration = str(f, "duration_hours").replace(",", ".");
+  const mapsUrl = str(f, "maps_url");
+  if (mapsUrl && !/^https:\/\//i.test(mapsUrl)) return { error: "El link de Google Maps debe empezar con https://" };
   const { error } = await supabase.from("rounds").update({
     played_on: str(f, "played_on") || null,
     start_time: str(f, "start_time") || null,
+    duration_hours: duration ? Number(duration) : null,
     place: str(f, "place") || null,
+    maps_url: mapsUrl || null,
     court_cost: costRaw ? Number(costRaw) : null,
   }).eq("id", str(f, "id"));
   if (error) return { error: error.message };
   revalidatePath(`/admin/torneos/${str(f, "tournament_id")}`);
+  revalidatePath("/");
   return { ok: true, message: "Fecha guardada" };
 }

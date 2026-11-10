@@ -31,6 +31,8 @@ export type Round = {
   place: string | null;
   start_time: string | null;   // "19:30:00"
   court_cost: number | null;
+  duration_hours: number | null;
+  maps_url: string | null;
 };
 
 export type RoundStat = {

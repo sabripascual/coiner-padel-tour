@@ -3,6 +3,7 @@ import { useActionState, useEffect, useState, useTransition } from "react";
 import { deleteTournament, renameTournament, setEnrollment, setTournamentStatus, updateRound } from "../../actions";
 import FormMessage from "@/components/FormMessage";
 import type { Round, Tournament } from "@/lib/types";
+import { DURATIONS, formatDuration } from "@/lib/utils";
 
 export function TournamentControls({ tournament: t }: { tournament: Tournament }) {
   const [state, action] = useActionState(renameTournament, null);
@@ -50,7 +51,7 @@ export function RoundEditor({ round }: { round: Round }) {
   if (!open) return <button onClick={() => setOpen(true)} className="text-xs font-semibold text-brand-700">Editar</button>;
   return (
     <div className="fixed inset-0 z-40 grid place-items-end bg-black/40 sm:place-items-center" onClick={() => setOpen(false)}>
-      <form action={action} onClick={(e) => e.stopPropagation()} className="w-full space-y-3 rounded-t-2xl bg-white p-5 sm:max-w-sm sm:rounded-2xl">
+      <form action={action} onClick={(e) => e.stopPropagation()} className="max-h-[90dvh] w-full space-y-3 overflow-y-auto rounded-t-2xl bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:max-w-sm sm:rounded-2xl">
         <h3 className="h2">Fecha {round.number}</h3>
         <input type="hidden" name="id" value={round.id} />
         <input type="hidden" name="tournament_id" value={round.tournament_id} />
@@ -58,7 +59,19 @@ export function RoundEditor({ round }: { round: Round }) {
           <div><label className="label">Día</label><input type="date" name="played_on" defaultValue={round.played_on ?? ""} className="input" /></div>
           <div><label className="label">Hora reserva</label><input type="time" name="start_time" defaultValue={round.start_time?.slice(0, 5) ?? ""} className="input" /></div>
         </div>
+        <div>
+          <label className="label">Duración del turno</label>
+          <select name="duration_hours" defaultValue={round.duration_hours != null ? String(Number(round.duration_hours)) : ""} className="input">
+            <option value="">Sin definir</option>
+            {DURATIONS.map((d) => <option key={d} value={String(d)}>{formatDuration(d)}</option>)}
+          </select>
+        </div>
         <div><label className="label">Lugar / cancha</label><input name="place" defaultValue={round.place ?? ""} placeholder="Ej: Club Norte · Cancha 3" className="input" /></div>
+        <div>
+          <label className="label">Ubicación (link de Google Maps)</label>
+          <input name="maps_url" type="url" inputMode="url" defaultValue={round.maps_url ?? ""} placeholder="https://maps.app.goo.gl/…" className="input" />
+          <p className="mt-1 text-xs text-gray-cool">En Google Maps: busca el lugar → Compartir → Copiar vínculo. Si lo dejas vacío, se busca por el nombre del lugar.</p>
+        </div>
         <div>
           <label className="label">Costo de la reserva ($)</label>
           <input name="court_cost" inputMode="numeric" defaultValue={round.court_cost != null ? String(Math.round(round.court_cost)) : ""} placeholder="Ej: 48000" className="input" />

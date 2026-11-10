@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import StatusChip from "@/components/StatusChip";
+import UpcomingRounds, { upcomingRounds } from "@/components/UpcomingRounds";
 import Carousel from "@/components/Carousel";
 import RankingTable from "@/components/RankingTable";
 import { createClient } from "@/lib/supabase-server";
@@ -62,6 +63,13 @@ export default async function Home() {
 
           <h2 className="h2 pt-2">Top 5</h2>
           <RankingTable rows={ranking.slice(0, 5)} />
+
+          {current.status === "en_curso" && (
+            <>
+              <h2 className="h2 pt-2">Próximas fechas</h2>
+              <UpcomingRounds rounds={upcomingRounds(rounds, played)} />
+            </>
+          )}
         </section>
       ) : (
         <section className="card p-6 text-center">

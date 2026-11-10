@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase-server";
-import { roundDetails } from "@/lib/utils";
+import { mapsLink, roundDetails } from "@/lib/utils";
 import type { Profile, Round, RoundStat, Tournament } from "@/lib/types";
 import Counters from "./Counters";
 
@@ -33,6 +33,9 @@ export default async function FechaPage({ params }: { params: Promise<{ id: stri
         <div>
           <h1 className="h1">Fecha {round.number}</h1>
           <p className="text-sm text-gray-cool">{roundDetails(round)}</p>
+          {mapsLink(round) && (
+            <a href={mapsLink(round)!} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-brand-700">📍 Cómo llegar</a>
+          )}
         </div>
         <div className="flex gap-1">
           {round.number > 1 && <Link href={`/admin/torneos/${id}/fecha/${round.number - 1}`} className="btn-secondary px-3">‹</Link>}
