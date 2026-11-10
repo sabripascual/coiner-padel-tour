@@ -33,7 +33,6 @@ export default async function Home() {
 
   return (
     <div className="space-y-6">
-      <InstallPrompt />
       <Carousel slides={slides} />
 
       {current ? (
@@ -80,6 +79,7 @@ export default async function Home() {
           <p className="mt-4 text-gray-cool">Todavía no hay un torneo en curso. ¡Muy pronto!</p>
         </section>
       )}
+      <InstallPrompt />
     </div>
   );
 }
