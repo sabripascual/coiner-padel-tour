@@ -5,9 +5,23 @@ import { getCurrentProfile } from "@/lib/auth";
 import RegisterSW from "@/components/RegisterSW";
 import Footer from "@/components/Footer";
 
+// URL pública del sitio (Vercel la define sola); WhatsApp necesita links absolutos a la imagen
+const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "http://localhost:3000";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: { default: "COINER PADEL TOUR", template: "%s · COINER PADEL TOUR" },
   description: "Ranking, fechas y recuerdos del torneo de pádel Coiner",
+  openGraph: {
+    type: "website",
+    locale: "es_AR",
+    siteName: "COINER PADEL TOUR",
+    title: "COINER PADEL TOUR",
+    description: "Ranking, próximas fechas y recuerdos del torneo de pádel Coiner",
+  },
+  twitter: { card: "summary_large_image", title: "COINER PADEL TOUR" },
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: "Coiner Padel", statusBarStyle: "default" },
   icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" },
